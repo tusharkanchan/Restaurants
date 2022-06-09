@@ -7,6 +7,7 @@
     "bootstrap-social": "^5.1.1",
     "cross-fetch": "^2.1.0",
     "font-awesome": "^4.7.0",
+    "gh-pages": "^4.0.0",
     "prop-types": "^15.6.0",
     "react": "^18.1.0",
     "react-animation-components": "^3.0.0",
@@ -21,6 +22,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
   },
+  "homepage": "https://tusharkanchan.github.io/Restaurants/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
