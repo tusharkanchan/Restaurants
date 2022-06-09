@@ -1,2 +1,1 @@
-# Restaurants
-React practice website
+# restaurants
