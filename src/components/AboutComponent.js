@@ -11,6 +11,8 @@ import {
   Media,
 } from "reactstrap";
 import { Link } from "react-router-dom";
+import { baseUrl } from "../shared/baseUrl";
+
 function RenderLeaders({ leaders }) {
   if (leaders != null) {
     return (
@@ -21,7 +23,7 @@ function RenderLeaders({ leaders }) {
           return (
             <CardBody className="col-12 row">
               <div className="col-2 ">
-                <CardImg src={leader.image} alt={leader.name}></CardImg>
+                <CardImg src={baseUrl + leaders.image} alt={leaders.name} />
               </div>
               <div className="col-10">
                 <h5>{leader.name}</h5>
@@ -40,6 +42,7 @@ function RenderLeaders({ leaders }) {
 }
 
 function About(props) {
+  console.log("props ", props);
   const leaders = props.leaders.map((leader) => {
     return <p>Leader {leader.name}</p>;
   });
@@ -120,7 +123,11 @@ function About(props) {
           <h2>Corporate Leadership</h2>
         </div>
         <div className="col-12">
-          <RenderLeaders leaders={props.leaders}></RenderLeaders>
+          <RenderLeaders
+            leaders={props.leaders}
+            leadersLoading={props.isLoading}
+            leadersErrMess={props.errMess}
+          ></RenderLeaders>
           {/* <Media list>{leaders}</Media> */}
         </div>
       </div>

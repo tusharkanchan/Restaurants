@@ -17,9 +17,12 @@ import {
   Row,
 } from "reactstrap";
 
+import { FadeTransform, Fade, Stagger } from "react-animation-components";
 import { Control, LocalForm, Errors } from "react-redux-form";
 import { Link } from "react-router-dom";
 import { Loading } from "./LoadingComponent";
+import { baseUrl } from "../shared/baseUrl";
+
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !val || val.length <= len;
 const minLength = (len) => (val) => val && val.length >= len;
@@ -77,13 +80,20 @@ const minLength = (len) => (val) => val && val.length >= len;
 function RenderDish({ dish }) {
   return (
     <div className="col-12 col-md-5  m-1  ">
-      <Card>
-        <CardImg top src={dish.image} alt={dish.name}></CardImg>
-        <CardBody>
-          <CardTitle>{dish.name}</CardTitle>
-          <CardText>{dish.description}</CardText>
-        </CardBody>
-      </Card>
+      <FadeTransform
+        in
+        transformProps={{
+          exitTransform: "scale(0.5) translateY(-50%)",
+        }}
+      >
+        <Card>
+          <CardImg top src={baseUrl + dish.image} alt={dish.name} />
+          <CardBody>
+            <CardTitle>{dish.name}</CardTitle>
+            <CardText>{dish.description}</CardText>
+          </CardBody>
+        </Card>
+      </FadeTransform>
       {/* <Card key={dish.dishDetail?.id} className=" col-md-5 m-1">
         <CardImg
           width="100%"
@@ -99,25 +109,35 @@ function RenderDish({ dish }) {
   );
 }
 
-function RenderComments({ comments, addComment, dishId }) {
+function RenderComments({ comments, postComment, dishId }) {
   if (comments != null) {
     return (
       <Card className="col-12 col-md-5 m-1">
         <h4>Comment</h4>
+
         <ul className="list-unstyled">
-          {comments.map((comment) => {
-            return (
-              <li key={comment.id}>
-                <p>{comment.comment}</p>
-                <p>-- {comment.author}</p>
-              </li>
-            );
-          })}
+          <Stagger in>
+            {comments.map((comment) => {
+              return (
+                <Fade in>
+                  <li key={comment.id}>
+                    <p>{comment.comment}</p>
+                    <p>
+                      -- {comment.author} ,{" "}
+                      {new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                      }).format(new Date(Date.parse(comment.date)))}
+                    </p>
+                    {/* , {new Intl.DateTimeFormat(comment.date)} */}
+                  </li>
+                </Fade>
+              );
+            })}
+          </Stagger>
         </ul>
-        <CommentForm
-          dishId={dishId}
-          addComment={comments.addComment}
-        ></CommentForm>
+        <CommentForm dishId={dishId} postComment={postComment}></CommentForm>
       </Card>
     );
   } else {
@@ -128,27 +148,34 @@ class CommentForm extends Component {
   constructor(props) {
     console.log("props ", props);
     super(props);
-    this.toggleModel = this.toggleModel.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+
     // this.addComment = this.addComment.bind(this);
     this.state = {
       isNavOpen: false,
       isModalOpen: false,
     };
+    this.toggleModal = this.toggleModal.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
-  toggleModel() {
+  toggleModal() {
     this.setState({
       isModalOpen: !this.state.isModalOpen,
     });
   }
   handleSubmit(values) {
-    this.toggleModel();
-    this.props.addComment(this.props.dishId, values);
+    console.log("values ", values);
+    this.toggleModal();
+    this.props.postComment(
+      this.props.dishId,
+      values.rating,
+      values.author,
+      values.comment
+    );
   }
   render() {
     return (
       <div>
-        <button color="primary" onClick={this.toggleModel}>
+        <button color="primary" onClick={this.toggleModal}>
           Submit Comment
         </button>
 
@@ -178,9 +205,9 @@ class CommentForm extends Component {
                 <Col>
                   <Label htmlFor="author">Author</Label>
                   <Control.text
-                    model=".auhor"
-                    id="auhor"
-                    name="auhor"
+                    model=".author"
+                    id="author"
+                    name="author"
                     placeholder="Your Name"
                     className="form-control"
                     validators={{
@@ -208,9 +235,9 @@ class CommentForm extends Component {
                   <Label htmlFor="comment">Comment</Label>
                   <Control.textarea
                     rows="6"
-                    model=".Comment"
-                    id="Comment"
-                    name="Comment"
+                    model=".comment"
+                    id="comment"
+                    name="comment"
                     placeholder="Comment"
                     className="form-control"
                   />
@@ -228,6 +255,7 @@ class CommentForm extends Component {
 }
 
 const DishDetail = (props) => {
+  console.log("props ", props);
   if (props.isLoading) {
     return (
       <div className="container">
@@ -264,7 +292,7 @@ const DishDetail = (props) => {
             <RenderDish dish={props.dish}></RenderDish>
             <RenderComments
               comments={props.comments}
-              addComment={props.addComment}
+              postComment={props.postComment}
               dishId={props.dish.id}
             ></RenderComments>
             {/* <SubmitComments></SubmitComments> */}

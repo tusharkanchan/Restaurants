@@ -40,7 +40,6 @@ class Header extends Component {
     this.setState({
       isModalOpen: !this.state.isModalOpen,
     });
-    console.log(this.state.isModalOpen);
   }
   handleLogin(event) {
     this.toggleModal();
